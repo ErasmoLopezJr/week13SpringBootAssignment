@@ -2,7 +2,6 @@ package pet.store.entity;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.hibernate.internal.build.AllowPrintStacktrace;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,7 +17,7 @@ import lombok.ToString;
 public class Customer {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private int customerId;
+  private Long customerId;
   private String customerFirstName;
   private String customerLastName;
   private String customerEmail;
