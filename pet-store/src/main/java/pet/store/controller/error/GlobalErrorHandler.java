@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 @Slf4j
 public class GlobalErrorHandler {
+ 
   @ExceptionHandler(NoSuchElementException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND) 
   public Map <String, String> handleNoSuchElementException(NoSuchElementException e) {
@@ -22,5 +23,5 @@ public class GlobalErrorHandler {
     
   }
   
-
+ 
 }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import lombok.extern.slf4j.Slf4j;
 import pet.store.controller.model.PetStoreData;
+import pet.store.controller.model.PetStoreData.PetStoreEmployee;
 import pet.store.service.PetStoreService;
 
 @RestController
@@ -38,6 +39,14 @@ public class PetStoreController {
     log.info("Updating Pet Store {}", petStoreData);
     return petStoreService.savePetStore(petStoreData);
     
+  }
+  
+  @PostMapping("/pet_store/{petStoreId}/employee")
+  @ResponseStatus(HttpStatus.CREATED)
+  public PetStoreEmployee insertEmployee (@PathVariable Long petStoreId,
+      @RequestBody PetStoreEmployee petStoreEmployee) {
+    log.info("Creating employee for {} for pet store with ID={}", petStoreEmployee, petStoreId );
+    return petStoreService.saveEmployee(petStoreId, petStoreEmployee);
   }
       
 }

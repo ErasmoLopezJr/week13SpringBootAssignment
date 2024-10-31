@@ -1,11 +1,16 @@
 package pet.store.service;
 
 import java.util.NoSuchElementException;
+
 import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pet.store.controller.model.PetStoreData;
+import pet.store.controller.model.PetStoreData.PetStoreEmployee;
+import pet.store.dao.EmployeeDao;
 import pet.store.dao.PetStoreDao;
+import pet.store.entity.Employee;
 import pet.store.entity.PetStore;
 
 @Service
@@ -13,6 +18,9 @@ public class PetStoreService {
   
   @Autowired
   private PetStoreDao petStoreDao;
+  
+  @Autowired
+  private EmployeeDao employeeDao;
 
   public PetStoreData savePetStore(PetStoreData petStoreData) {
     Long petStoreId = petStoreData.getPetStoreId();
@@ -52,6 +60,62 @@ public class PetStoreService {
     return petStoreDao.findById( petStoreId).orElseThrow(() -> new NoSuchElementException(
         "Pet store wit ID= " + petStoreId + " was not found."));
   }
+
+  @Transactional(readOnly = false)
+  public PetStoreEmployee saveEmployee(Long petStoreId, PetStoreEmployee petStoreEmployee) {
+    
+    PetStore petStore = findPetStoreById(petStoreId);
+    
+    Employee employee = findOrCreateEmployee(petStoreId, petStoreEmployee.getEmployeeId());
+    copyEmployeeFields(employee, petStoreEmployee);
+    
+    employee.setPetStore(petStore);
+    petStore.getEmployees().add(employee);
+    
+    Employee dbEmployee = employeeDao.save(employee);
+    return new PetStoreEmployee(dbEmployee);
+  }
   
+
+  private Employee findOrCreateEmployee(Long petStoreId, Long employeeId) {
+    Employee employee;
+    
+    if(Objects.isNull(employeeId)) {
+      employee = new Employee();
+    }
+    else {
+      employee = findEmployeeById(petStoreId, employeeId);
+    }
+    
+    return employee;
+  }
+
+  
+  
+  private Employee findEmployeeById(Long petStoreId, Long employeeId) {
+    
+     Employee employee = employeeDao.findById(employeeId)
+        .orElseThrow(() -> new NoSuchElementException(
+            "Employee with ID=" + employeeId + " Does not exist."));
+    
+    if(employee.getPetStore().getPetStoreId() != petStoreId) {
+      throw new IllegalArgumentException("Employee with ID=" + employeeId + 
+          " is not part of store with ID=" + petStoreId); 
+    }
+    return employee;
+  }
+
+  private void copyEmployeeFields(Employee employee, PetStoreEmployee petStoreEmployee) {
+    
+    employee.setEmployeeFirstName(petStoreEmployee.getEmployeeFirstName());
+    employee.setEmployeeLastName(petStoreEmployee.getEmployeeLastName());
+    employee.setEmployeePhone(petStoreEmployee.getEmployeePhone());
+    employee.setEmployeeJobTitle(petStoreEmployee.getEmployeeJobTitle());
+        
+  }
+
+
+
+ 
 
 }
